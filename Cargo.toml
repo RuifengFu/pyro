@@ -1,0 +1,21 @@
+[package]
+name = "pyro"
+version = "0.1.0"
+edition = "2024"
+description = "Offline GPU fire simulation and physically based volume rendering (wgpu)"
+license = "MIT"
+repository = "https://github.com/RuifengFu/pyro"
+
+[dependencies]
+anyhow = "1.0.104"
+bytemuck = { version = "1.25.2", features = ["derive"] }
+clap = { version = "4.6.7", features = ["derive"] }
+png = "0.18.1"
+pollster = "1.0.1"
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.2.1"
+wgpu = { version = "30.0.1", default-features = false, features = ["metal", "wgsl", "std", "parking_lot"] }
+
+[profile.release]
+opt-level = 3
+debug = false

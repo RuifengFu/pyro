@@ -1,0 +1,38 @@
+# 1 m 正庚烷油池火（验证用：有大量实验数据）
+# 参考：燃烧速率 m'' ≈ 0.101(1−e^{−1.1D}) ≈ 0.067 kg/m²s → HRR ≈ 2.2 MW；
+#       Heskestad 平均火焰高 L = 0.235 Q^0.4 − 1.02 D ≈ 3.6–4.1 m；脉动频率 f ≈ 1.5/√D ≈ 1.5 Hz
+
+[domain]
+size = [3.2, 6.4, 3.2]
+cell = 0.04
+
+[sim]
+duration = 12
+cfl = 1.5
+vorticity = 6
+
+[[object]]
+kind = "pool"
+material = "heptane"
+center = [1.6, 0.0, 1.6]
+radius = 0.5
+depth = 0.08
+
+[ignition]
+pos = [1.6, 0.12, 1.6]
+radius = 0.3
+flux = 30000
+temp = 1300
+until = 4.0
+
+[render]
+width = 1280
+height = 720
+camera = [1.6, 1.6, -5.0]
+target = [1.6, 2.2, 1.6]
+fov = 50
+
+[output]
+# 相对路径以本文件所在目录为基准
+dir = "../renders/pool"
+preroll = 4.0

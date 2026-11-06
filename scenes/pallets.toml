@@ -1,0 +1,37 @@
+# 木托盘堆火（大型物品燃烧）：12 个 1.2 m × 1.0 m 托盘叠成约 1.7 m 高
+# 参考：NIST/FM 托盘堆实验，同等规模峰值 HRR 约 2–4 MW，火焰高 4–6 m
+
+[domain]
+size = [4.0, 8.0, 4.0]
+cell = 0.03
+
+[sim]
+duration = 15
+cfl = 1.5
+vorticity = 6
+
+[[object]]
+kind = "pallets"
+material = "wood"
+center = [2.0, 0.0, 2.0]
+count = 12
+yaw = 15
+
+[ignition]
+pos = [2.0, 0.1, 2.0]
+radius = 0.45
+flux = 60000
+temp = 1300
+until = 25.0
+
+[render]
+width = 1280
+height = 720
+spp = 32
+camera = [2.0, 1.8, -5.5]
+target = [2.0, 2.6, 2.0]
+fov = 55
+
+[output]
+dir = "../renders/pallets"
+preroll = 30.0
