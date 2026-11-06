@@ -305,7 +305,24 @@ fn main() -> Result<()> {
         );
     }
     if let (true, Some(p)) = (cli.open, &last_path) {
-        let _ = std::process::Command::new("/usr/bin/open").arg(p).status();
+        open_file(p);
     }
     Ok(())
+}
+
+/// 用系统默认程序打开文件
+fn open_file(p: &std::path::Path) {
+    let r = if cfg!(target_os = "macos") {
+        std::process::Command::new("open").arg(p).status()
+    } else if cfg!(target_os = "windows") {
+        std::process::Command::new("cmd")
+            .args(["/C", "start", ""])
+            .arg(p)
+            .status()
+    } else {
+        std::process::Command::new("xdg-open").arg(p).status()
+    };
+    if r.is_err() {
+        eprintln!("无法自动打开 {}", p.display());
+    }
 }

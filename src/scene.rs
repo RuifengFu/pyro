@@ -819,7 +819,10 @@ mod tests {
     use super::*;
 
     fn scene(objects: &str) -> Scene {
-        toml::from_str(&format!("[domain]\nsize = [1.6, 1.6, 1.6]\ncell = 0.05\n{objects}")).unwrap()
+        toml::from_str(&format!(
+            "[domain]\nsize = [1.6, 1.6, 1.6]\ncell = 0.05\n{objects}"
+        ))
+        .unwrap()
     }
 
     #[test]
@@ -831,7 +834,9 @@ mod tests {
 
     #[test]
     fn box_voxel_volume() {
-        let s = scene("[[object]]\nkind = \"box\"\nmaterial = \"wood\"\ncenter = [0.8, 0.4, 0.8]\nsize = [0.4, 0.4, 0.4]\n");
+        let s = scene(
+            "[[object]]\nkind = \"box\"\nmaterial = \"wood\"\ncenter = [0.8, 0.4, 0.8]\nsize = [0.4, 0.4, 0.4]\n",
+        );
         let sol = s.voxelize().unwrap();
         let n = sol.iter().filter(|c| c[1] > 0.0).count();
         // 0.4 m / 0.05 m = 8 格 → 512 格（边界取等号会多出一圈的一部分）
@@ -847,7 +852,10 @@ mod tests {
         let sol = s.voxelize().unwrap();
         let [nx, ny, _] = s.grid().dims.map(|v| v as usize);
         let at = |i: usize, j: usize, k: usize| sol[i + nx * (j + ny * k)];
-        assert!(at(16, 16, 16)[1] > 0.0 || at(16, 15, 16)[1] > 0.0, "薄板被丢掉了");
+        assert!(
+            at(16, 16, 16)[1] > 0.0 || at(16, 15, 16)[1] > 0.0,
+            "薄板被丢掉了"
+        );
         assert!(at(16, 0, 16)[1] > 0.0, "浅油池被丢掉了");
         assert_eq!(at(16, 1, 16)[1], 0.0);
     }

@@ -12,14 +12,16 @@ pub struct Gpu {
 impl Gpu {
     pub fn new() -> Result<Gpu> {
         let mut desc = wgpu::InstanceDescriptor::new_without_display_handle();
-        desc.backends = wgpu::Backends::METAL | wgpu::Backends::VULKAN;
+        // 默认：macOS 用 Metal，Windows 用 DX12/Vulkan，Linux 用 Vulkan；可用环境变量 WGPU_BACKEND=vulkan|dx12|metal 指定
+        desc.backends = wgpu::Backends::from_env().unwrap_or(wgpu::Backends::PRIMARY);
         let instance = wgpu::Instance::new(desc);
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             power_preference: wgpu::PowerPreference::HighPerformance,
             ..Default::default()
         }))
         .context("找不到可用的 GPU")?;
-        let name = adapter.get_info().name;
+        let info = adapter.get_info();
+        let name = format!("{}（{:?}）", info.name, info.backend);
         let limits = adapter.limits();
         let (device, queue) = pollster::block_on(adapter.request_device(&wgpu::DeviceDescriptor {
             label: Some("pyro"),

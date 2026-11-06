@@ -10,7 +10,15 @@ Rust + wgpu（Metal / Vulkan）写的原生程序：GPU 上做可燃物热解 + 
 
 ## 安装
 
-需要 Rust（1.85+）、支持 Metal 或 Vulkan 的 GPU、ffmpeg（可选，用于合成视频）。
+需要 Rust（1.85+）、ffmpeg（可选，用于合成视频），以及下列任一 GPU 后端（wgpu 自动选择，着色器为 WGSL，会自动翻译）：
+
+| 系统 | 后端 |
+|---|---|
+| macOS | Metal |
+| Windows | DirectX 12 / Vulkan |
+| Linux | Vulkan |
+
+可用环境变量强制指定，如 `WGPU_BACKEND=vulkan`。开发和验证在 Apple M5（Metal）上完成；Linux/Windows 由 CI 保证能编译与通过单元测试，GPU 上的实际运行尚未在这两个平台测试。显存/内存建议 8 GB 以上（2 cm 网格约需 3 GB）。
 
 ```
 cargo build --release
