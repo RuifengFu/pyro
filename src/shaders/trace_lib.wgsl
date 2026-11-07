@@ -59,8 +59,9 @@ fn medium(g: vec3f, tau: f32) -> Med {
   let aerT = vec3f(R.c.x * aer);
   m.st = sootT + aerT;
   m.ss = sootT * R.soot.w + aerT * R.c.y;
-  // 碳烟热辐射（吸收系数 = 消光 ×（1 − 反照率），查找表已含 κ_λ 的波长依赖）
-  m.em = lutAt(0u, s.y) * fv * 1e-6 + R.b.w * max(s.w, 0.0) * vec3f(0.12, 0.28, 1.0);
+  // 碳烟热辐射（吸收系数 = 消光 ×（1 − 反照率），查找表已含 κ_λ 的波长依赖）；
+  // CH*/C2* 化学发光只在几乎没有碳烟的反应区可见（0.05 ppm 碳烟就衰减到 1/e），否则被碳烟黄光盖住
+  m.em = lutAt(0u, s.y) * fv * 1e-6 + R.b.w * max(s.w, 0.0) * exp(-20.0 * fv) * vec3f(0.12, 0.28, 1.0);
   return m;
 }
 

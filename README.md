@@ -8,6 +8,10 @@ Rust + wgpu（Metal / Vulkan）写的原生程序：GPU 上做可燃物热解 + 
 
 *1 m 正庚烷油池火，2 cm 网格（820 万单元），720p。*
 
+![直径 6 m 大篝火，10 cm 网格](docs/bonfire_6m.png)
+
+*直径 6 m 的原木大篝火（`scenes/bonfire.toml`），10 cm 网格（610 万单元），22 m 外仰拍。*
+
 ## 安装
 
 需要 Rust（1.85+）、ffmpeg（可选，用于合成视频），以及下列任一 GPU 后端（wgpu 自动选择，着色器为 WGSL，会自动翻译）：
@@ -39,7 +43,7 @@ pyro scenes/pool.toml --sim-only --slice # 另输出中心截面（T、燃料、
 
 ## 场景文件
 
-TOML，见 `scenes/`。物体类型：`box`、`cylinder`、`sphere`、`pool`（液池）、`crib`（木垛）、`pallets`（托盘堆）。
+TOML，见 `scenes/`。物体类型：`box`、`cylinder`、`sphere`、`pool`（液池）、`crib`（木垛）、`pallets`（托盘堆）、`bonfire`（圆锥原木大篝火）。
 材料：`wood`、`cardboard`、`pu_foam`、`pmma`、`rubber`、`heptane`、`gasoline`、`diesel`（可燃），`steel`、`concrete`（不燃）。
 
 ## 物理模型
@@ -74,3 +78,4 @@ TOML，见 `scenes/`。物体类型：`box`、`cylinder`、`sphere`、`pool`（�
 - 稠密网格：2 cm 网格（820 万单元）每帧模拟约 3 s；更细需要稀疏网格。
 - 还没有亚格子湍流细节放大（wavelet turbulence），火焰小尺度结构受网格限制。
 - 固体不会坍塌、移动。
+- 大火规模下（几十 MW）问题更明显：辐射分数可达 0.7–0.8；平流不严格守恒质量，热释放率比热解供给高约 50%。`bonfire.toml` 通过减少碳烟生成、加快氧化来获得合理外观。

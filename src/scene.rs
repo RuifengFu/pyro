@@ -800,7 +800,71 @@ fn expand(o: &Object, dx: f32) -> Result<Vec<Shape>> {
             }
             v
         }
-        k => bail!("未知物体类型 {k}（可选 box/cylinder/sphere/pool/crib/pallets）"),
+        // 大篝火：外圈 count 根原木斜靠成圆锥帐篷（底半径 radius、高 size[1]），内圈一半数量的短原木，
+        // 中心垫 3 层交错木垛作燃料床；原木直径 stick，位置、角度、粗细带随机扰动
+        "bonfire" => {
+            let r = o.radius.max(0.5);
+            let h = if o.size[1] > 0.0 { o.size[1] } else { 1.3 * r };
+            let n = o.count.max(6);
+            let d = if o.stick > 0.0 { o.stick } else { 0.08 * r };
+            let mut v = Vec::new();
+            let mut k = 0u32;
+            let mut rnd = || {
+                k += 1;
+                hash(k.wrapping_mul(2654435761) ^ 0x5bd1e995)
+            };
+            let tau = std::f32::consts::TAU;
+            for (ring, cnt, rr, hh) in [(0, n, r, h), (1, n / 2, 0.6 * r, 0.75 * h)] {
+                for i in 0..cnt {
+                    let th =
+                        tau * (i as f32 + 0.5 * ring as f32) / cnt as f32 + 0.25 * (rnd() - 0.5);
+                    let rb = rr * (0.88 + 0.17 * rnd());
+                    let a = [c[0] + rb * th.cos(), c[1] + 0.5 * d, c[2] + rb * th.sin()];
+                    // 顶端在中轴附近交叉，略过中轴，原木伸出顶点一截
+                    let tt = th + std::f32::consts::PI + 0.6 * (rnd() - 0.5);
+                    let off = 0.07 * r * (0.5 + rnd());
+                    let top = [
+                        c[0] + off * tt.cos(),
+                        c[1] + hh * (0.9 + 0.15 * rnd()),
+                        c[2] + off * tt.sin(),
+                    ];
+                    let ext = 1.08 + 0.1 * rnd();
+                    let b = [
+                        a[0] + (top[0] - a[0]) * ext,
+                        a[1] + (top[1] - a[1]) * ext,
+                        a[2] + (top[2] - a[2]) * ext,
+                    ];
+                    v.push(Shape::Cyl {
+                        a,
+                        b,
+                        r: 0.5 * d * (0.75 + 0.5 * rnd()),
+                    });
+                }
+            }
+            for l in 0..3 {
+                let y = c[1] + d * (l as f32 + 0.5);
+                for s in 0..5 {
+                    let off = -0.5 * r + r * s as f32 / 4.0 + 0.1 * r * (rnd() - 0.5);
+                    let len = 0.7 * r;
+                    let ang = if l % 2 == 0 {
+                        0.0
+                    } else {
+                        std::f32::consts::FRAC_PI_2
+                    } + 0.3 * (rnd() - 0.5);
+                    let (sa, ca) = ang.sin_cos();
+                    let p0 = [c[0] - sa * off, y, c[2] + ca * off];
+                    let a = [p0[0] - ca * len, y, p0[2] - sa * len];
+                    let b = [p0[0] + ca * len, y, p0[2] + sa * len];
+                    v.push(Shape::Cyl {
+                        a,
+                        b,
+                        r: 0.5 * d * (0.7 + 0.4 * rnd()),
+                    });
+                }
+            }
+            v
+        }
+        k => bail!("未知物体类型 {k}（可选 box/cylinder/sphere/pool/crib/pallets/bonfire）"),
     })
 }
 

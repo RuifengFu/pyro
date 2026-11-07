@@ -76,7 +76,7 @@ fn main(@builtin(global_invocation_id) gid: vec3u) {
   let c = vec3i(gid);
   if (!inb(c)) { return; }
   let v = textureLoad(volR, c, 0);
-  let em = lutAt(v.y) * max(v.x, 0.0) * 1e-6 + chemi.x * max(v.w, 0.0) * vec3f(0.12, 0.28, 1.0);
+  let em = lutAt(v.y) * max(v.x, 0.0) * 1e-6 + chemi.x * max(v.w, 0.0) * exp(-20.0 * max(v.x, 0.0)) * vec3f(0.12, 0.28, 1.0);
   var e = dot(em, vec3f(0.2126, 0.7152, 0.0722)) * P.dx * P.dx * P.dx;
   // 光学厚的火焰内部发出的光大多逃不出来：按 6 个轴向的平均逃逸透射率加权选取概率（只改变 pdf，不改变期望）
   if (e > 0.0) {
